@@ -3,9 +3,13 @@ import {
   Autocomplete,
   Box,
   Button,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
   Modal,
   Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -36,6 +40,7 @@ const Dashboard = () => {
   const [productsModal, setproductsModal] = useState(false);
   const [storeModal, setstoreModal] = useState(false);
   const [storeData, setstoreData] = useState({});
+  const [filter, setFilter] = useState({});
 
   const { AllProd_store, isProd_storeLoading } = useSelector(
     (state) => state.Prod_Store
@@ -124,20 +129,46 @@ const Dashboard = () => {
         )}
 
         {store && (
-          <Button
+          <Box
             sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 2,
               mb: "1rem",
-            }}
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              setEditProducts({});
-              setEditId(null);
-              setproductsModal((prev) => !prev);
+              padding: "5px",
             }}
           >
-            Add Product
-          </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setEditProducts({});
+                setEditId(null);
+                setproductsModal((prev) => !prev);
+              }}
+            >
+              Add Product
+            </Button>
+            <Box sx={{ minWidth: 150 }}>
+              <FormControl fullWidth>
+                <InputLabel>Sort by price</InputLabel>
+                <Select
+                  value={filter?.price || ""}
+                  label="Sort by price"
+                  onChange={(e) =>
+                    setFilter({ ...filter, price: e.target.value })
+                  }
+                >
+                  <MenuItem value={"l2h"}>Low to High</MenuItem>
+                  <MenuItem value={"h2l"}>High to low</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <TextField label="Search" variant="outlined" onChange={(e) => setFilter({ ...filter, name: e.target.value })}/>
+            <Button variant="contained" color="primary" onClick={() => {dispatch(GetAllProducts(filter, store?._id))}}>
+              Apply
+            </Button>
+          </Box>
         )}
 
         <TableContainer component={Paper}>

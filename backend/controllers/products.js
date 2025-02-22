@@ -19,25 +19,23 @@ exports.createProduct = async (req, res) => {
 
 // Get all products
 exports.getProducts = async (req, res) => {
-  const { limit = 10, page = 1, price, category } = req.query;
+  const { limit = 10, page = 1, price, name } = req.query;
   const storeId = req.params.storeId;
   if (limit < 0 || page < 0) {
     return res.status(400).json({ message: "Invalid pagination parameters" });
   }
 
   let filter = { store: storeId };
-  if (price) {
-    filter.price = price;
-  }
-  if (category) {
-    filter.category = category;
+  if (name) {
+    filter.name = new RegExp(name, "i");
   }
 
   try {
     const products = await Product.find(filter)
       .populate("store")
       .limit(limit)
-      .skip((page - 1) * limit);
+      .skip((page - 1) * limit)
+      .sort({ price: price === "l2h" ? 1 : -1 });
 
     res
       .status(200)
